@@ -1,19 +1,18 @@
 package com.service.weathersaver.WeatherSaverApp.dto;
 
-import com.service.weathersaver.WeatherSaverApp.models.Sensor;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 public class MeasurementDTO {
-
     @Min(value = -100, message = "Value should be between -100 and 100")
     @Max(value = 100, message = "Value should be between -100 and 100")
     @NotNull
     private Double value;
-
     @NotNull(message = "Raining value can't be null")
     private Boolean raining;
-
-    private Sensor sensor;
+    @NotNull
+    private SensorDTO sensor;
 
     public Double getValue() {
         return value;
@@ -31,11 +30,11 @@ public class MeasurementDTO {
         this.raining = raining;
     }
 
-    public Sensor getSensor() {
+    public SensorDTO getSensor() {
         return sensor;
     }
 
-    public void setSensor(Sensor sensor) {
+    public void setSensor(SensorDTO sensor) {
         this.sensor = sensor;
     }
 
@@ -44,7 +43,7 @@ public class MeasurementDTO {
         return "MeasurementDTO{" +
                 "value=" + value +
                 ", raining=" + raining +
-                ", sensor name=" + sensor +
+                ", sensor name=" + sensor.getName() +
                 '}';
     }
 }

@@ -4,8 +4,10 @@ import com.service.weathersaver.WeatherSaverApp.dto.MeasurementDTO;
 import com.service.weathersaver.WeatherSaverApp.models.Measurement;
 import com.service.weathersaver.WeatherSaverApp.services.MeasurementsService;
 import com.service.weathersaver.WeatherSaverApp.services.SensorsService;
-import com.service.weathersaver.WeatherSaverApp.util.exceptions.MeasurementNotAddedException;
-import com.service.weathersaver.WeatherSaverApp.util.responses.MeasurementErrorResponse;
+import com.service.weathersaver.WeatherSaverApp.util.MeasurementsResponse;
+import com.service.weathersaver.WeatherSaverApp.util.errors.ErrorUtil;
+import com.service.weathersaver.WeatherSaverApp.util.errors.MeasurementErrorResponse;
+import com.service.weathersaver.WeatherSaverApp.util.exceptions.SensorException;
 import com.service.weathersaver.WeatherSaverApp.util.validators.MeasurementValidator;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -13,12 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -27,7 +25,6 @@ public class MeasurementsController {
     private final MeasurementsService measurementsService;
     private final ModelMapper modelMapper;
     private final MeasurementValidator measurementValidator;
-
     private final SensorsService sensorsService;
 
     @Autowired
@@ -42,47 +39,29 @@ public class MeasurementsController {
     public ResponseEntity<HttpStatus> add(@RequestBody @Valid MeasurementDTO measurementDTO,
                                           BindingResult bindingResult) {
         Measurement measurement = convertToMeasurement(measurementDTO);
-
-        System.out.println(measurement);
-
         measurementValidator.validate(measurement, bindingResult);
 
-        System.out.println("after valid");
-        if(bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-
-            List<FieldError> errors = bindingResult.getFieldErrors();
-
-            for(FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ")
-                        .append(error.getDefaultMessage())
-                        .append(";");
-            }
-
-            System.out.println(errorMessage);
-            throw new MeasurementNotAddedException(errorMessage.toString());
+        if (bindingResult.hasErrors()) {
+            ErrorUtil.returnErrorsToClient(bindingResult);
         }
 
-        measurement.setSensor(sensorsService.findByName(measurement.getSensor().getName()).get());
         measurementsService.save(measurement);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping()
-    public List<MeasurementDTO> getMeasurements() {
-        return measurementsService.findAll().stream().map(this::convertToMeasurementDTO)
-                .collect(Collectors.toList());
+    public MeasurementsResponse getMeasurements() {
+        return new MeasurementsResponse(measurementsService.findAll().stream().map(this::convertToMeasurementDTO)
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/rainyDaysCount")
-    public HashMap<String, Integer> getRainyDays() {
-        int count  = measurementsService.findRainigDays();
-        return new HashMap<String, Integer>(Collections.singletonMap("count", count));
+    public Long getRainyDays() {
+        return measurementsService.findRainigDays();
     }
 
     @ExceptionHandler
-    private ResponseEntity<MeasurementErrorResponse> handlerException(MeasurementNotAddedException e) {
+    private ResponseEntity<MeasurementErrorResponse> handlerException(SensorException e) {
         MeasurementErrorResponse response = new MeasurementErrorResponse(
                 e.getMessage(),
                 System.currentTimeMillis()
@@ -92,14 +71,10 @@ public class MeasurementsController {
     }
 
     private Measurement convertToMeasurement(MeasurementDTO measurementDTO) {
-        System.out.println(measurementDTO);
-
-
         return modelMapper.map(measurementDTO, Measurement.class);
     }
 
     private MeasurementDTO convertToMeasurementDTO(Measurement measurement) {
-        MeasurementDTO measurementDTO = modelMapper.map(measurement, MeasurementDTO.class);
-        return measurementDTO;
+        return modelMapper.map(measurement, MeasurementDTO.class);
     }
 }

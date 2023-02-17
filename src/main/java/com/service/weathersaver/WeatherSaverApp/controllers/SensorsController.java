@@ -3,8 +3,9 @@ package com.service.weathersaver.WeatherSaverApp.controllers;
 import com.service.weathersaver.WeatherSaverApp.dto.SensorDTO;
 import com.service.weathersaver.WeatherSaverApp.models.Sensor;
 import com.service.weathersaver.WeatherSaverApp.services.SensorsService;
-import com.service.weathersaver.WeatherSaverApp.util.exceptions.SensorNotRegisteredException;
-import com.service.weathersaver.WeatherSaverApp.util.responses.SensorErrorResponse;
+import com.service.weathersaver.WeatherSaverApp.util.errors.ErrorUtil;
+import com.service.weathersaver.WeatherSaverApp.util.exceptions.SensorException;
+import com.service.weathersaver.WeatherSaverApp.util.errors.SensorErrorResponse;
 import com.service.weathersaver.WeatherSaverApp.util.validators.SensorValidator;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -42,13 +43,10 @@ public class SensorsController {
 
             List<FieldError> errors = bindingResult.getFieldErrors();
 
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ")
-                        .append(error.getDefaultMessage())
-                        .append(";");
+            if (bindingResult.hasErrors()) {
+                ErrorUtil.returnErrorsToClient(bindingResult);
             }
-            throw new SensorNotRegisteredException(errorMessage.toString());
+
         }
 
         sensorsService.save(sensorToRegister);
@@ -56,7 +54,7 @@ public class SensorsController {
     }
 
     @ExceptionHandler
-    private ResponseEntity<SensorErrorResponse> handlerException(SensorNotRegisteredException e) {
+    private ResponseEntity<SensorErrorResponse> handlerException(SensorException e) {
         SensorErrorResponse response = new SensorErrorResponse(
                 e.getMessage(),
                 System.currentTimeMillis()
@@ -66,14 +64,10 @@ public class SensorsController {
     }
 
     private Sensor convertToSensor(SensorDTO sensorDTO) {
-
-        System.out.println(sensorDTO);
         return modelMapper.map(sensorDTO, Sensor.class);
     }
 
     private SensorDTO convertToSensorDTO(Sensor sensor) {
-
-
         return modelMapper.map(sensor, SensorDTO.class);
     }
 }

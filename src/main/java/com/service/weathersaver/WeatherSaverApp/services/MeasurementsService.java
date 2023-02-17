@@ -13,10 +13,12 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class MeasurementsService {
     private final MeasurementsRepository measurementsRepository;
+    private final SensorsService sensorsService;
 
     @Autowired
-    public MeasurementsService(MeasurementsRepository measurementsRepository) {
+    public MeasurementsService(MeasurementsRepository measurementsRepository, SensorsService sensorsService) {
         this.measurementsRepository = measurementsRepository;
+        this.sensorsService = sensorsService;
     }
 
     @Transactional
@@ -29,11 +31,12 @@ public class MeasurementsService {
         return measurementsRepository.findAll();
     }
 
-    public int findRainigDays() {
-        return measurementsRepository.findByRaining(true).size();
+    public Long findRainigDays() {
+        return measurementsRepository.findByRaining(true).stream().count();
     }
 
     private void enrichMeasurement(Measurement measurement) {
+        measurement.setSensor(sensorsService.findByName(measurement.getSensor().getName()).get());
         measurement.setAddedAt(LocalDateTime.now());
     }
 }

@@ -1,8 +1,9 @@
 package com.service.weathersaver.WeatherSaverApp.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
@@ -13,22 +14,18 @@ public class Measurement {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     @Column(name = "value")
     @Min(value = -100, message = "Value should be between -100 and 100")
     @Max(value = 100, message = "Value should be between -100 and 100")
     @NotNull
     private Double value;
-
     @Column(name = "raining")
     @NotNull
     private Boolean raining;
     @ManyToOne
-    @JoinColumn(name = "sensor_id", referencedColumnName = "id")
+    @JoinColumn(name = "sensor", referencedColumnName = "name")
     @NotNull(message = "Sensor shouldn't be empty")
-    @JsonBackReference
     private Sensor sensor;
-
     @Column(name = "added_at")
     private LocalDateTime addedAt;
 
@@ -59,7 +56,7 @@ public class Measurement {
         this.value = value;
     }
 
-    public Boolean getRaining() {
+    public Boolean isRaining() {
         return raining;
     }
 

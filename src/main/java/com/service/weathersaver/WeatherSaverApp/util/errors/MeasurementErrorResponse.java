@@ -1,4 +1,4 @@
-package com.service.weathersaver.WeatherSaverApp.util.responses;
+package com.service.weathersaver.WeatherSaverApp.util.errors;
 
 public class MeasurementErrorResponse {
     private String message;
