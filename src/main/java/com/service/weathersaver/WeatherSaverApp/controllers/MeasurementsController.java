@@ -3,7 +3,6 @@ package com.service.weathersaver.WeatherSaverApp.controllers;
 import com.service.weathersaver.WeatherSaverApp.dto.MeasurementDTO;
 import com.service.weathersaver.WeatherSaverApp.models.Measurement;
 import com.service.weathersaver.WeatherSaverApp.services.MeasurementsService;
-import com.service.weathersaver.WeatherSaverApp.services.SensorsService;
 import com.service.weathersaver.WeatherSaverApp.util.MeasurementsResponse;
 import com.service.weathersaver.WeatherSaverApp.util.errors.ErrorUtil;
 import com.service.weathersaver.WeatherSaverApp.util.errors.MeasurementErrorResponse;
@@ -25,14 +24,12 @@ public class MeasurementsController {
     private final MeasurementsService measurementsService;
     private final ModelMapper modelMapper;
     private final MeasurementValidator measurementValidator;
-    private final SensorsService sensorsService;
 
     @Autowired
-    public MeasurementsController(MeasurementsService measurementsService, ModelMapper modelMapper, MeasurementValidator measurementValidator, SensorsService sensorsService) {
+    public MeasurementsController(MeasurementsService measurementsService, ModelMapper modelMapper, MeasurementValidator measurementValidator) {
         this.measurementsService = measurementsService;
         this.modelMapper = modelMapper;
         this.measurementValidator = measurementValidator;
-        this.sensorsService = sensorsService;
     }
 
     @PostMapping("/add")
