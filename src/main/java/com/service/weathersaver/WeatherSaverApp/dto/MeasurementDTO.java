@@ -13,7 +13,7 @@ public class MeasurementDTO {
     @NotNull(message = "Raining value can't be null")
     private Boolean raining;
 
-    private SensorDTO sensorDTO;
+    private Sensor sensor;
 
     public Double getValue() {
         return value;
@@ -31,11 +31,20 @@ public class MeasurementDTO {
         this.raining = raining;
     }
 
-    public SensorDTO getSensorDTO() {
-        return sensorDTO;
+    public Sensor getSensor() {
+        return sensor;
     }
 
-    public void setSensorDTO(SensorDTO sensorDTO) {
-        this.sensorDTO = sensorDTO;
+    public void setSensor(Sensor sensor) {
+        this.sensor = sensor;
+    }
+
+    @Override
+    public String toString() {
+        return "MeasurementDTO{" +
+                "value=" + value +
+                ", raining=" + raining +
+                ", sensor name=" + sensor +
+                '}';
     }
 }

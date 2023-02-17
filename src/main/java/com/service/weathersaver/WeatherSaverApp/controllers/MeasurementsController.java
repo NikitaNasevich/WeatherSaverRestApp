@@ -1,7 +1,6 @@
 package com.service.weathersaver.WeatherSaverApp.controllers;
 
 import com.service.weathersaver.WeatherSaverApp.dto.MeasurementDTO;
-import com.service.weathersaver.WeatherSaverApp.dto.SensorDTO;
 import com.service.weathersaver.WeatherSaverApp.models.Measurement;
 import com.service.weathersaver.WeatherSaverApp.services.MeasurementsService;
 import com.service.weathersaver.WeatherSaverApp.services.SensorsService;
@@ -17,6 +16,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,6 +75,12 @@ public class MeasurementsController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/rainyDaysCount")
+    public HashMap<String, Integer> getRainyDays() {
+        int count  = measurementsService.findRainigDays();
+        return new HashMap<String, Integer>(Collections.singletonMap("count", count));
+    }
+
     @ExceptionHandler
     private ResponseEntity<MeasurementErrorResponse> handlerException(MeasurementNotAddedException e) {
         MeasurementErrorResponse response = new MeasurementErrorResponse(
@@ -85,12 +92,14 @@ public class MeasurementsController {
     }
 
     private Measurement convertToMeasurement(MeasurementDTO measurementDTO) {
+        System.out.println(measurementDTO);
+
+
         return modelMapper.map(measurementDTO, Measurement.class);
     }
 
     private MeasurementDTO convertToMeasurementDTO(Measurement measurement) {
         MeasurementDTO measurementDTO = modelMapper.map(measurement, MeasurementDTO.class);
-        measurementDTO.setSensorDTO(new SensorDTO(measurement.getSensor().getName()));
         return measurementDTO;
     }
 }

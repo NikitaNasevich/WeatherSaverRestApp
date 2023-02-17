@@ -29,6 +29,10 @@ public class MeasurementsService {
         return measurementsRepository.findAll();
     }
 
+    public int findRainigDays() {
+        return measurementsRepository.findByRaining(true).size();
+    }
+
     private void enrichMeasurement(Measurement measurement) {
         measurement.setAddedAt(LocalDateTime.now());
     }

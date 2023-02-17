@@ -66,10 +66,14 @@ public class SensorsController {
     }
 
     private Sensor convertToSensor(SensorDTO sensorDTO) {
+
+        System.out.println(sensorDTO);
         return modelMapper.map(sensorDTO, Sensor.class);
     }
 
     private SensorDTO convertToSensorDTO(Sensor sensor) {
+
+
         return modelMapper.map(sensor, SensorDTO.class);
     }
 }
