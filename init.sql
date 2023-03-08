@@ -13,4 +13,3 @@ CREATE TABLE Measurements
     sensor varchar(30) REFERENCES Sensors(name)
 );
 
-drop table Measurements
